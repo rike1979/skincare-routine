@@ -5,354 +5,357 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#0c0c0e">
+  <meta name="theme-color" content="#0d0d10">
   <title>Skincare</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after {
-      box-sizing: border-box; margin: 0; padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
 
-    html { height: 100%; background: #0c0c0e; }
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { height: 100%; background: #0d0d10; }
 
     body {
-      background: #0c0c0e;
-      color: #e4e4e8;
+      background: #0d0d10;
+      color: #f0f0f4;
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
-      line-height: 1.4;
+      line-height: 1.45;
       min-height: 100dvh;
       -webkit-font-smoothing: antialiased;
       overscroll-behavior-y: none;
     }
 
-    /* ── HEADER ─────────────────────────────────────────────────── */
+    /* ── HEADER ─────────────────────────────────────────────── */
 
     .hdr {
       position: fixed; top: 0; left: 50%;
       transform: translateX(-50%);
       width: 100%; max-width: 480px;
       z-index: 100;
-      background: rgba(12,12,14,.92);
-      backdrop-filter: blur(22px) saturate(160%);
-      -webkit-backdrop-filter: blur(22px) saturate(160%);
-      border-bottom: 1px solid #222226;
+      background: rgba(13,13,16,.93);
+      backdrop-filter: blur(24px) saturate(160%);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid #26262c;
       padding-top: env(safe-area-inset-top, 0px);
     }
 
     .hdr-top {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 18px 10px;
+      padding: 16px 18px 12px;
     }
 
     .app-name {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 21px; font-weight: 300;
-      letter-spacing: .1em; color: #e4e4e8;
+      font-size: 22px; font-weight: 300;
+      letter-spacing: .1em; color: #f0f0f4;
     }
 
-    .date-nav {
-      display: flex; align-items: center; gap: 4px;
+    /* Date button */
+    .date-btn {
+      display: flex; align-items: center; gap: 5px;
+      background: none; border: 1px solid #2a2a30;
+      border-radius: 20px;
+      padding: 6px 12px;
+      color: #c0c0cc; font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 400;
+      cursor: pointer; transition: all .18s;
+      letter-spacing: .02em;
     }
+    .date-btn:active { border-color: #7a59b8; color: #f0f0f4; }
+    .date-btn .arrow {
+      font-size: 9px; color: #606070;
+      transition: transform .22s ease;
+      display: inline-block;
+    }
+    .date-btn.open .arrow { transform: rotate(180deg); }
+    .date-btn .past-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: #7a59b8; flex-shrink: 0;
+      display: none;
+    }
+    .date-btn.is-past .past-dot { display: block; }
+    .date-btn.is-future .past-dot { display: block; background: #4a8a6a; }
 
-    .nav-btn {
-      background: none; border: none;
-      color: #4a4a55; cursor: pointer;
-      font-size: 18px; line-height: 1;
-      padding: 4px 6px; border-radius: 6px;
-      transition: color .15s;
-      -webkit-user-select: none; user-select: none;
+    /* Day picker dropdown */
+    .day-picker {
+      max-height: 0; overflow: hidden;
+      transition: max-height .25s cubic-bezier(.4,0,.2,1);
     }
-    .nav-btn:active { color: #7a59b8; background: rgba(122,89,184,.12); }
-    .nav-btn:disabled { opacity: .18; pointer-events: none; }
+    .day-picker.open { max-height: 72px; }
 
-    .date-label {
-      font-size: 11px; color: #8a8a96;
-      letter-spacing: .03em;
-      min-width: 116px; text-align: center;
+    .day-chips {
+      display: flex; gap: 6px;
+      padding: 4px 14px 12px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
     }
-    .date-label .dn { color: #e4e4e8; }
-    .date-label .past-tag {
-      display: block; font-size: 9px;
-      color: #7a59b8; letter-spacing: .1em;
-      text-transform: uppercase; margin-bottom: 1px;
-    }
+    .day-chips::-webkit-scrollbar { display: none; }
 
-    .clock {
-      font-size: 12px; color: #4a4a55;
-      font-variant-numeric: tabular-nums; letter-spacing: .04em;
-      min-width: 36px; text-align: right;
+    .chip {
+      flex-shrink: 0;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      padding: 7px 11px;
+      border-radius: 10px;
+      border: 1px solid #26262c;
+      background: transparent;
+      cursor: pointer;
+      transition: all .15s;
+      min-width: 52px;
     }
+    .chip:active { background: rgba(122,89,184,.15); border-color: rgba(122,89,184,.4); }
+    .chip.today { border-color: #7a59b8; background: rgba(122,89,184,.15); }
+    .chip.selected { background: #7a59b8; border-color: #7a59b8; }
+    .chip.future { border-color: #1e2e26; }
+    .chip-day {
+      font-size: 10px; letter-spacing: .06em;
+      color: #7a7a8c; font-weight: 400;
+      text-transform: uppercase;
+    }
+    .chip.today .chip-day    { color: #b090e0; }
+    .chip.selected .chip-day { color: rgba(255,255,255,.7); }
+    .chip.future .chip-day   { color: #4a6a5a; }
+    .chip-date {
+      font-size: 13px; color: #c0c0cc; font-weight: 400;
+    }
+    .chip.today .chip-date    { color: #f0f0f4; }
+    .chip.selected .chip-date { color: #fff; font-weight: 500; }
+    .chip.future .chip-date   { color: #6a9a7a; }
+    .chip-dot {
+      width: 4px; height: 4px; border-radius: 50%;
+      background: #7a59b8; opacity: 0;
+      margin-top: 1px;
+    }
+    .chip.has-data .chip-dot { opacity: 1; }
+    .chip.selected .chip-dot { background: rgba(255,255,255,.6); }
 
     /* Tabs */
     .tabs {
       display: grid; grid-template-columns: 1fr 1fr;
       gap: 5px; padding: 0 14px 11px;
     }
-
     .tab {
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #222226;
-      background: transparent;
-      color: #4a4a55;
+      padding: 11px; border-radius: 8px;
+      border: 1px solid #26262c;
+      background: transparent; color: #606070;
       font-family: 'DM Sans', sans-serif;
-      font-size: 11px; font-weight: 400;
-      letter-spacing: .1em; text-transform: uppercase;
+      font-size: 12px; font-weight: 400;
+      letter-spacing: .09em; text-transform: uppercase;
       cursor: pointer; transition: all .18s;
       min-height: 44px;
     }
     .tab.active { background: #7a59b8; border-color: #7a59b8; color: #fff; }
-    .tab:not(.active):active { border-color: rgba(122,89,184,.4); color: #8a8a96; }
+    .tab:not(.active):active { border-color: rgba(122,89,184,.35); color: #9090a0; }
 
     /* Progress */
     .prog-row {
       display: flex; align-items: center; gap: 10px;
       padding: 0 14px 13px;
     }
-    .prog-count {
-      font-size: 10px; color: #4a4a55;
-      font-variant-numeric: tabular-nums; min-width: 28px;
-    }
-    .prog-track {
-      flex: 1; height: 1.5px;
-      background: #222226; border-radius: 1px;
-      overflow: visible; position: relative;
-    }
+    .prog-count { font-size: 11px; color: #606070; font-variant-numeric: tabular-nums; min-width: 32px; }
+    .prog-track { flex: 1; height: 1.5px; background: #26262c; border-radius: 1px; position: relative; }
     .prog-fill {
-      height: 100%; border-radius: 1px;
-      background: #7a59b8;
-      transition: width .4s cubic-bezier(.25,1,.5,1);
-      position: relative;
+      height: 100%; border-radius: 1px; background: #7a59b8;
+      transition: width .4s cubic-bezier(.25,1,.5,1); position: relative;
     }
     .prog-fill::after {
-      content: ''; position: absolute; right: -2px; top: 50%;
-      transform: translateY(-50%);
-      width: 5px; height: 5px; border-radius: 50%;
-      background: #7a59b8;
-      box-shadow: 0 0 7px rgba(122,89,184,.55);
-      opacity: 0; transition: opacity .3s;
+      content: ''; position: absolute; right: -2px; top: 50%; transform: translateY(-50%);
+      width: 5px; height: 5px; border-radius: 50%; background: #7a59b8;
+      box-shadow: 0 0 7px rgba(122,89,184,.6); opacity: 0; transition: opacity .3s;
     }
     .prog-fill.dot::after { opacity: 1; }
 
-    /* Past-day notice */
-    .past-notice {
+    /* Status notice */
+    .notice {
       display: none;
-      background: rgba(122,89,184,.07);
-      border-top: 1px solid rgba(122,89,184,.2);
-      padding: 7px 14px;
-      font-size: 10px; color: rgba(160,130,210,.7);
-      letter-spacing: .07em; text-align: center;
+      padding: 6px 14px; border-top: 1px solid rgba(122,89,184,.18);
+      font-size: 10px; letter-spacing: .07em; text-align: center;
     }
-    .past-notice.show { display: block; }
+    .notice.past   { display: block; color: rgba(150,120,200,.65); background: rgba(122,89,184,.06); }
+    .notice.future { display: block; color: rgba(100,160,120,.65); background: rgba(70,130,90,.06); }
 
-    /* ── MAIN ───────────────────────────────────────────────────── */
+    /* ── MAIN ───────────────────────────────────────────────── */
 
-    .main {
-      max-width: 480px; margin: 0 auto;
-      padding: 0 12px;
-      padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
-    }
-
-    #spacer { /* set by JS */ }
+    .main { max-width: 480px; margin: 0 auto; padding: 0 12px; padding-bottom: calc(44px + env(safe-area-inset-bottom, 0px)); }
+    #spacer { }
 
     .panel { display: none; }
-    .panel.active { display: block; animation: fadeUp .22s ease both; }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(7px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .sec {
-      font-size: 9px; letter-spacing: .2em;
-      text-transform: uppercase; color: #4a4a55;
-      padding: 20px 4px 9px;
-    }
+    .panel.active { display: block; animation: up .22s ease both; }
+    @keyframes up { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
 
     /* Aktiv banner */
     .aktiv-card {
       display: flex; align-items: center; gap: 12px;
-      background: #111114;
-      border: 1px solid #222226;
-      border-radius: 12px;
-      padding: 13px 14px; margin-bottom: 4px;
+      background: #131318; border: 1px solid #26262c;
+      border-radius: 12px; padding: 13px 14px; margin-bottom: 6px;
+      margin-top: 18px;
     }
     .aktiv-pill {
       font-size: 9px; font-weight: 500;
       letter-spacing: .1em; text-transform: uppercase;
-      padding: 4px 9px; border-radius: 4px; flex-shrink: 0;
+      padding: 4px 9px; border-radius: 5px; flex-shrink: 0;
     }
-    .aktiv-pill.bha     { background: #2a5a7a; color: #8acce0; }
-    .aktiv-pill.retinal { background: #4a3a8a; color: #b4a0e4; }
-    .aktiv-pill.maske   { background: #6a2a40; color: #e8a0b0; }
-    .aktiv-pill.pause   { background: #222226; color: #4a4a55; }
+    .aktiv-pill.bha     { background: #1e4a6a; color: #7abce0; }
+    .aktiv-pill.retinal { background: #3a2a6a; color: #a890e4; }
+    .aktiv-pill.maske   { background: #5a1e30; color: #e090a0; }
+    .aktiv-pill.pause   { background: #222228; color: #606070; }
     .aktiv-meta { flex: 1; min-width: 0; }
-    .aktiv-day  { font-size: 10px; color: #4a4a55; margin-bottom: 2px; }
-    .aktiv-prod { font-size: 13px; color: #e4e4e8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .aktiv-day  { font-size: 10px; color: #606070; margin-bottom: 2px; }
+    .aktiv-prod { font-size: 14px; color: #e0e0e8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* ── ITEM ───────────────────────────────────────────────────── */
+    /* ── ITEMS ──────────────────────────────────────────────── */
+
+    .item-list { padding-top: 14px; display: flex; flex-direction: column; gap: 5px; }
 
     .item {
-      display: flex; align-items: flex-start; gap: 12px;
-      padding: 14px 12px 14px 14px;
+      display: flex; align-items: flex-start; gap: 13px;
+      padding: 14px 13px 14px 14px;
       border-radius: 12px;
-      border: 1px solid #1c1c20;
-      background: rgba(255,255,255,.014);
-      margin-bottom: 5px;
       cursor: pointer;
-      transition: opacity .18s, border-color .15s, background .15s;
+      transition: opacity .18s;
       -webkit-user-select: none; user-select: none;
-      min-height: 64px;
+      min-height: 68px;
     }
+
+    /* Must-have: solid border, purple tint */
     .item.must {
-      background: rgba(122,89,184,.11);
-      border-color: rgba(122,89,184,.28);
+      background: rgba(122,89,184,.1);
+      border: 1px solid rgba(122,89,184,.26);
     }
-    .item.done {
-      opacity: .26 !important;
-      background: transparent !important;
-      border-color: #1c1c20 !important;
+
+    /* Optional: subtle, slightly muted */
+    .item.opt {
+      background: rgba(255,255,255,.025);
+      border: 1px dashed rgba(255,255,255,.1);
+      opacity: .82;
     }
+
+    /* Checked: fade both types */
+    .item.done { opacity: .28 !important; }
+    .item.done.must { background: transparent !important; border: 1px solid #26262c !important; }
+    .item.done.opt  { background: transparent !important; border: 1px dashed #1e1e24 !important; }
+
     .item.ro { cursor: default; }
 
-    /* Circle checkbox */
+    /* Circle */
     .chk {
-      width: 22px; height: 22px; flex-shrink: 0;
-      border-radius: 50%; border: 1.5px solid #2a2a2e;
-      display: flex; align-items: center; justify-content: center;
-      margin-top: 1px;
-      transition: background .2s, border-color .2s;
+      width: 24px; height: 24px; flex-shrink: 0;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      margin-top: 0; transition: background .2s, border-color .2s;
     }
-    .item.must .chk { border-color: rgba(122,89,184,.35); }
+    .item.must .chk { border: 1.5px solid rgba(122,89,184,.4); }
+    .item.opt  .chk { border: 1.5px solid #2e2e36; }
     .item.done .chk { background: #7a59b8; border-color: #7a59b8; }
     .chk svg { opacity: 0; transform: scale(.5); transition: all .18s ease; }
     .item.done .chk svg { opacity: 1; transform: scale(1); }
 
     .item-body { flex: 1; min-width: 0; }
 
-    .item-meta {
-      display: flex; align-items: center; gap: 5px; margin-bottom: 3px;
-    }
+    .item-meta { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
     .item-step {
-      font-size: 9px; letter-spacing: .13em;
-      text-transform: uppercase; color: #4a4a55;
+      font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
     }
-    .item.must .item-step  { color: rgba(150,120,210,.75); }
-    .item.done .item-step  { color: #4a4a55 !important; }
+    .item.must .item-step { color: rgba(160,130,215,.8); }
+    .item.opt  .item-step { color: #606070; }
+    .item.done .item-step { color: #404048 !important; }
 
     .ptag {
       font-size: 8px; font-weight: 500; letter-spacing: .07em;
       padding: 1px 5px; border-radius: 3px;
     }
-    .ptag.m { background: #7a59b8; color: #fff; }
-    .ptag.o { background: rgba(255,255,255,.05); color: #4a4a55; }
+    .ptag.m { background: rgba(122,89,184,.6); color: #fff; }
+    .ptag.o { background: rgba(255,255,255,.06); color: #606070; }
 
     .item-name {
-      font-size: 14px; font-weight: 400;
-      color: #e4e4e8; line-height: 1.3; margin-bottom: 4px;
+      font-size: 15px; font-weight: 400;
+      color: #f0f0f4; line-height: 1.3; margin-bottom: 4px;
     }
-    .item.done .item-name { text-decoration: line-through; color: #4a4a55; }
+    .item.opt  .item-name { color: #d0d0d8; }
+    .item.done .item-name { text-decoration: line-through; color: #404048 !important; }
 
-    .item-hint { font-size: 11px; color: #8a8a96; line-height: 1.4; }
-    .item.must .item-hint { color: rgba(170,150,200,.55); }
-    .item.done .item-hint { color: #4a4a55 !important; }
+    .item-hint { font-size: 12px; line-height: 1.4; }
+    .item.must .item-hint { color: rgba(180,160,215,.55); }
+    .item.opt  .item-hint { color: #606070; }
+    .item.done .item-hint { color: #404048 !important; }
 
-    /* Info button */
+    /* Info btn */
     .ibtn {
       flex-shrink: 0; align-self: flex-start;
-      width: 28px; height: 28px;
-      border-radius: 50%; border: 1px solid #222226;
-      background: transparent; color: #4a4a55;
-      cursor: pointer;
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 1px solid #26262c; background: transparent;
+      color: #606070; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       transition: all .15s;
     }
-    .ibtn:active { border-color: #7a59b8; color: #7a59b8; background: rgba(122,89,184,.1); }
+    .ibtn:active { border-color: #7a59b8; color: #a080d8; background: rgba(122,89,184,.1); }
 
     /* Note */
     .note {
-      margin-top: 14px; padding: 10px 13px;
-      border: 1px solid #1c1c20; border-radius: 8px;
-      font-size: 11px; color: #4a4a55; line-height: 1.55;
+      margin-top: 16px; padding: 11px 13px;
+      border: 1px solid #1e1e24; border-radius: 8px;
+      font-size: 12px; color: #606070; line-height: 1.55;
     }
-    .note b { color: #8a8a96; font-weight: 500; }
+    .note b { color: #8a8a9c; font-weight: 500; }
 
-    /* ── BOTTOM SHEET ───────────────────────────────────────────── */
+    /* ── BOTTOM SHEET ───────────────────────────────────────── */
 
     .overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,.62);
-      z-index: 200; opacity: 0; pointer-events: none;
-      transition: opacity .25s;
+      position: fixed; inset: 0; background: rgba(0,0,0,.65);
+      z-index: 200; opacity: 0; pointer-events: none; transition: opacity .25s;
     }
     .overlay.open { opacity: 1; pointer-events: auto; }
 
     .sheet {
       position: fixed; bottom: 0;
       left: 50%; transform: translateX(-50%) translateY(calc(100% + 2px));
-      width: 100%; max-width: 480px;
-      z-index: 201;
-      background: #17171b;
-      border-top: 1px solid #222226;
+      width: 100%; max-width: 480px; z-index: 201;
+      background: #18181e; border-top: 1px solid #26262c;
       border-radius: 18px 18px 0 0;
       transition: transform .32s cubic-bezier(.32,.72,0,1);
       max-height: 72dvh; overflow-y: auto;
       padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
     }
     .sheet.open { transform: translateX(-50%) translateY(0); }
-
-    .sheet-grip {
-      width: 30px; height: 3px;
-      background: #2a2a2e; border-radius: 2px;
-      margin: 13px auto 0;
-    }
+    .sheet-grip { width: 30px; height: 3px; background: #2a2a32; border-radius: 2px; margin: 13px auto 0; }
     .sheet-body { padding: 20px 22px 0; }
-    .s-cat {
-      font-size: 9px; letter-spacing: .18em;
-      text-transform: uppercase; color: #7a59b8; margin-bottom: 7px;
-    }
+    .s-cat { font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: #7a59b8; margin-bottom: 7px; }
     .s-name {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 24px; font-weight: 300;
-      color: #e4e4e8; line-height: 1.2; margin-bottom: 20px;
+      font-size: 24px; font-weight: 300; color: #f0f0f4; line-height: 1.2; margin-bottom: 20px;
     }
-    .s-div { height: 1px; background: #222226; margin-bottom: 16px; }
+    .s-div { height: 1px; background: #26262c; margin-bottom: 16px; }
     .s-row { display: flex; gap: 14px; margin-bottom: 13px; }
-    .s-lbl {
-      font-size: 9px; letter-spacing: .13em;
-      text-transform: uppercase; color: #4a4a55;
-      width: 54px; flex-shrink: 0; padding-top: 3px;
-    }
-    .s-val { font-size: 14px; color: #e4e4e8; line-height: 1.45; }
+    .s-lbl { font-size: 9px; letter-spacing: .13em; text-transform: uppercase; color: #606070; width: 54px; flex-shrink: 0; padding-top: 3px; }
+    .s-val { font-size: 14px; color: #e0e0e8; line-height: 1.45; }
   </style>
 </head>
 <body>
 
-<!-- Fixed header -->
+<!-- Header -->
 <div class="hdr" id="hdr">
   <div class="hdr-top">
     <span class="app-name">Skincare</span>
-    <div class="date-nav">
-      <button class="nav-btn" id="prevBtn" onclick="shiftDay(-1)">‹</button>
-      <div class="date-label" id="dateLbl"></div>
-      <button class="nav-btn" id="nextBtn" onclick="shiftDay(1)" disabled>›</button>
-    </div>
-    <div class="clock" id="clockEl"></div>
+    <button class="date-btn" id="datebtn" onclick="togglePicker()">
+      <div class="past-dot"></div>
+      <span id="dateLbl">—</span>
+      <span class="arrow">▾</span>
+    </button>
   </div>
+
+  <div class="day-picker" id="dayPicker">
+    <div class="day-chips" id="dayChips"></div>
+  </div>
+
   <div class="tabs">
     <button class="tab" id="tab-morgens" onclick="selTab('morgens',true)">☀ Morgens</button>
     <button class="tab" id="tab-abends"  onclick="selTab('abends',true)">☽ Abends</button>
   </div>
   <div class="prog-row">
     <span class="prog-count" id="progCount">0/0</span>
-    <div class="prog-track">
-      <div class="prog-fill" id="progFill" style="width:0%"></div>
-    </div>
+    <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
   </div>
-  <div class="past-notice" id="pastNotice">Vergangener Tag · nur lesend</div>
+  <div class="notice" id="notice"></div>
 </div>
 
 <!-- Content -->
@@ -361,10 +364,7 @@
 
   <!-- MORGENS -->
   <div class="panel" id="panel-morgens">
-    <div class="sec">Pflicht</div>
-    <div id="m-must"></div>
-    <div class="sec" style="margin-top:4px">Optional</div>
-    <div id="m-opt"></div>
+    <div class="item-list" id="m-list"></div>
     <div class="note">
       <b>Was weglassen geht:</b> Toner, Hyaluron, Vitamin C, NMF – nice to have aber kein Muss.
       Reinigung + Niacinamide + SPF = Fundament.
@@ -373,12 +373,8 @@
 
   <!-- ABENDS -->
   <div class="panel" id="panel-abends">
-    <div class="sec">Aktiv-Schritt heute</div>
     <div id="a-aktiv"></div>
-    <div class="sec">Pflicht</div>
-    <div id="a-must"></div>
-    <div class="sec" style="margin-top:4px">Optional</div>
-    <div id="a-opt"></div>
+    <div class="item-list" id="a-list"></div>
     <div class="note">
       <b>Wichtig:</b> BHA und Retinol/Retinal NIE am gleichen Abend!
       Die AHA+BHA Maske ersetzt den BHA-Abend.
@@ -394,100 +390,89 @@
 </div>
 
 <script>
-// ─── CONSTANTS ──────────────────────────────────────────────────────────────
+// ─── CONSTANTS ───────────────────────────────────────────────────────────────
 
-const DAYS = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
-const MAX_HIST = 7; // days to keep in localStorage
+const DAYS_DE  = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+const DAYS_SH  = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+const MAX_BACK = 7;
+const MAX_FWD  = 3;
 
 const WPLAN = {
-  0: { label:'PAUSE',    tag:'pause',   prod:'Keine Wirkstoffe – Haut erholen lassen',    key:null },
-  1: { label:'BHA',      tag:'bha',     prod:"Paula's Choice 2% BHA Liquid Exfoliant",    key:'pc-bha' },
-  2: { label:'Retinal',  tag:'retinal', prod:'G&G A-Game Retinal 0.1%',                   key:'gg-retinal' },
-  3: { label:'BHA',      tag:'bha',     prod:"Paula's Choice 2% BHA Liquid Exfoliant",    key:'pc-bha' },
-  4: { label:'Retinal',  tag:'retinal', prod:'G&G A-Game Retinal 0.1%',                   key:'gg-retinal' },
-  5: { label:'AHA+BHA',  tag:'maske',   prod:'TO AHA 30% + BHA 2% (10 Min einwirken!)',   key:'to-aha-bha' },
-  6: { label:'Retinal',  tag:'retinal', prod:'G&G A-Game Retinal 0.1%',                   key:'gg-retinal' },
+  0: { label:'PAUSE',   tag:'pause',   prod:'Keine Wirkstoffe – Haut erholen lassen',  key:null },
+  1: { label:'BHA',     tag:'bha',     prod:"Paula's Choice 2% BHA Liquid Exfoliant",  key:'pc-bha' },
+  2: { label:'Retinal', tag:'retinal', prod:'G&G A-Game Retinal 0.1%',                 key:'gg-retinal' },
+  3: { label:'BHA',     tag:'bha',     prod:"Paula's Choice 2% BHA Liquid Exfoliant",  key:'pc-bha' },
+  4: { label:'Retinal', tag:'retinal', prod:'G&G A-Game Retinal 0.1%',                 key:'gg-retinal' },
+  5: { label:'AHA+BHA', tag:'maske',   prod:'TO AHA 30% + BHA 2% (10 Min einwirken!)', key:'to-aha-bha' },
+  6: { label:'Retinal', tag:'retinal', prod:'G&G A-Game Retinal 0.1%',                 key:'gg-retinal' },
 };
 
 const PINFO = {
-  'pc-cleanser':    { name:"Paula's Choice Oil-Reducing Cleanser",  cat:'Reinigung',         fuer:'Du',            info:'Beste Wahl für Mischhaut/Unreinheiten' },
-  'mixsoon-oil':    { name:'Mixsoon Bean Cleansing Oil',            cat:'Reinigung',         fuer:'Beide',         info:'Behalten – 1. Abend-Reinigung. Auf trockener Haut aufemulgieren.' },
-  'gg-toner':       { name:'G&G Liquid Hydration Toner',            cat:'Toner',             fuer:'Du (Nachfolger)', info:'Panthenol + MHF – stärkt Barriere, bereitet Haut optimal für Wirkstoffe vor' },
-  'gg-bbomb':       { name:'G&G B-Bomb 10% Niacinamide Serum',      cat:'Serum / Wirkstoff', fuer:'Du',            info:'Poren, Sebumkontrolle, Narben – ersetzt TO Niacinamide, günstiger im Duo' },
-  'dr-althea-vitc': { name:'Dr. Althea Vitamin C Boosting Serum',   cat:'Serum / Wirkstoff', fuer:'Du',            info:'Sehr gut – morgens für Narbenaufhellung und Schutz vor UV-Schäden' },
-  'gg-retinal':     { name:'G&G A-Game Retinal 0.1%',               cat:'Serum / Wirkstoff', fuer:'Du',            info:'Nachfolger des PC Retinol – stärker, besser für Narben & Textur' },
-  'to-ha':          { name:'TO Hyaluronic Acid 2% + B5',            cat:'Feuchtigkeit',      fuer:'Du',            info:'Leicht, perfekt für Mischhaut. Auf leicht feuchte Haut auftragen.' },
-  'pc-bha':         { name:"Paula's Choice 2% BHA Liquid Exfoliant",cat:'Säure / Exfoliant', fuer:'Du',            info:'Goldstandard für Poren & Unreinheiten' },
-  'to-aha-bha':     { name:'TO AHA 30% + BHA 2% Peeling Solution',  cat:'Säure / Exfoliant', fuer:'Du',            info:'1×/Woche als 10-Min-Intensivmaske. Danach gut eincremen!' },
-  'to-nmf':         { name:'The Ordinary NMF + HA',                  cat:'Feuchtigkeitspflege', fuer:'Du',          info:'Leicht – gut morgens unter SPF' },
-  'gg-happier':     { name:'G&G Happier Barrier Creme',              cat:'Feuchtigkeitspflege', fuer:'Du',          info:'Beste Wahl abends nach Säuren/Retinal – stärkt Hautbarriere, nicht komedogen' },
-  'spf-morgens':    { name:'Sonnenschutz',                           cat:'Sonnenschutz',      fuer:'Du',            info:'Aktuell: Round Lab Birch Juice SPF 50 (feuchtigkeitsbetont). Sobald verfügbar → G&G Zero Feel SPF 50 (mattes Finish, besser für Mischhaut).' },
+  'pc-cleanser':    { name:"Paula's Choice Oil-Reducing Cleanser",  cat:'Reinigung',          fuer:'Du',             info:'Beste Wahl für Mischhaut/Unreinheiten' },
+  'mixsoon-oil':    { name:'Mixsoon Bean Cleansing Oil',            cat:'Reinigung',          fuer:'Beide',          info:'1. Abend-Reinigung. Auf trockener Haut aufemulgieren.' },
+  'gg-toner':       { name:'G&G Liquid Hydration Toner',            cat:'Toner',              fuer:'Du (Nachfolger)', info:'Panthenol + MHF – stärkt Barriere, bereitet Haut optimal für Wirkstoffe vor' },
+  'gg-bbomb':       { name:'G&G B-Bomb 10% Niacinamide Serum',      cat:'Serum / Wirkstoff',  fuer:'Du',             info:'Poren, Sebumkontrolle, Narben – ersetzt TO Niacinamide, günstiger im Duo' },
+  'dr-althea-vitc': { name:'Dr. Althea Vitamin C Boosting Serum',   cat:'Serum / Wirkstoff',  fuer:'Du',             info:'Sehr gut – morgens für Narbenaufhellung und Schutz vor UV-Schäden' },
+  'gg-retinal':     { name:'G&G A-Game Retinal 0.1%',               cat:'Serum / Wirkstoff',  fuer:'Du',             info:'Nachfolger des PC Retinol – stärker, besser für Narben & Textur' },
+  'to-ha':          { name:'TO Hyaluronic Acid 2% + B5',            cat:'Feuchtigkeit',       fuer:'Du',             info:'Leicht, perfekt für Mischhaut. Auf leicht feuchte Haut auftragen.' },
+  'pc-bha':         { name:"Paula's Choice 2% BHA Liquid Exfoliant",cat:'Säure / Exfoliant',  fuer:'Du',             info:'Goldstandard für Poren & Unreinheiten' },
+  'to-aha-bha':     { name:'TO AHA 30% + BHA 2% Peeling Solution',  cat:'Säure / Exfoliant',  fuer:'Du',             info:'1×/Woche als 10-Min-Intensivmaske. Danach gut eincremen!' },
+  'to-nmf':         { name:'The Ordinary NMF + HA',                  cat:'Feuchtigkeitspflege',fuer:'Du',             info:'Leicht – gut morgens unter SPF' },
+  'gg-happier':     { name:'G&G Happier Barrier Creme',              cat:'Feuchtigkeitspflege',fuer:'Du',             info:'Beste Wahl abends nach Säuren/Retinal – stärkt Hautbarriere, nicht komedogen' },
+  'spf-morgens':    { name:'Sonnenschutz',                           cat:'Sonnenschutz',       fuer:'Du',             info:'Aktuell: Round Lab Birch Juice SPF 50 (feuchtigkeitsbetont). Sobald verfügbar → G&G Zero Feel SPF 50 (mattes Finish, besser für Mischhaut).' },
 };
 
-// ─── ITEM DEFINITIONS ───────────────────────────────────────────────────────
-
-const M_MUST = [
-  { id:'m1', step:'Reinigung',    name:"Paula's Choice Oil-Reducing Cleanser",            hint:'Basis für alles – niemals weglassen',               key:'pc-cleanser' },
-  { id:'m2', step:'Niacinamide',  name:'G&G B-Bomb 10% Niacinamide Serum',               hint:'Wichtigster Wirkstoff für Poren & Hautbild',         key:'gg-bbomb' },
-  { id:'m3', step:'Sonnenschutz', name:'Round Lab Birch Juice SPF 50 / G&G Zero Feel SPF 50', hint:'PFLICHT – ohne SPF sind alle Wirkstoffe sinnlos!',key:'spf-morgens' },
-];
-const M_OPT = [
-  { id:'m4', step:'Toner',        name:'G&G Liquid Hydration Toner',                      hint:'Bereitet Haut für Wirkstoffe vor',                  key:'gg-toner' },
-  { id:'m5', step:'Vitamin C',    name:'Dr. Althea Vitamin C Boosting Serum',             hint:'Morgens! Schutz vor UV-Schäden, Narben aufhellen',   key:'dr-althea-vitc' },
-  { id:'m6', step:'Feuchtigkeit', name:'TO Hyaluronic Acid 2% + B5',                      hint:'Auf leicht feuchte Haut',                           key:'to-ha' },
-  { id:'m7', step:'Abschluss',    name:'The Ordinary NMF + HA',                           hint:'Leicht, gut unter SPF',                             key:'to-nmf' },
+// Single unified lists in CORRECT ORDER — must:true = Pflicht, must:false = Optional
+const MORGENS = [
+  { id:'m1', step:'Reinigung',    name:"Paula's Choice Oil-Reducing Cleanser",               hint:'Basis für alles – niemals weglassen',              key:'pc-cleanser',    must:true },
+  { id:'m2', step:'Toner',        name:'G&G Liquid Hydration Toner',                         hint:'Bereitet Haut für Wirkstoffe vor',                 key:'gg-toner',       must:false },
+  { id:'m3', step:'Niacinamide',  name:'G&G B-Bomb 10% Niacinamide Serum',                   hint:'Wichtigster Wirkstoff für Poren & Hautbild',       key:'gg-bbomb',       must:true },
+  { id:'m4', step:'Vitamin C',    name:'Dr. Althea Vitamin C Boosting Serum',                hint:'Morgens! UV-Schutz, Narben aufhellen',             key:'dr-althea-vitc', must:false },
+  { id:'m5', step:'Feuchtigkeit', name:'TO Hyaluronic Acid 2% + B5',                         hint:'Auf leicht feuchte Haut',                         key:'to-ha',          must:false },
+  { id:'m6', step:'Abschluss',    name:'The Ordinary NMF + HA',                              hint:'Leicht, gut unter SPF',                           key:'to-nmf',         must:false },
+  { id:'m7', step:'Sonnenschutz', name:'Round Lab Birch Juice SPF 50 / G&G Zero Feel SPF 50',hint:'PFLICHT – ohne SPF sind alle Wirkstoffe sinnlos!', key:'spf-morgens',    must:true },
 ];
 
-function buildAbendsItems(dayIdx) {
+function buildAbends(dayIdx) {
   const a = WPLAN[dayIdx];
-  return {
-    aktiv: a,
-    must: [
-      { id:'a1', step:'Öl-Reinigung',     name:'Mixsoon Bean Cleansing Oil',                  hint:'Entfernt SPF, Make-up, Schmutz gründlich',      key:'mixsoon-oil' },
-      { id:'a2', step:'Wasser-Reinigung', name:"Paula's Choice Oil-Reducing Cleanser",         hint:'Kurz aber wichtig',                             key:'pc-cleanser' },
-      { id:'a3', step:`Aktiv-Schritt · ${a.label}`, name: a.prod,
-        hint: a.tag==='pause' ? 'Heute Pause – Haut erholen lassen' : 'Kern der Hautverbesserung – nie weglassen!',
-        key: a.key, isPause: a.tag==='pause' },
-    ],
-    opt: [
-      { id:'a4', step:'Toner',        name:'G&G Liquid Hydration Toner',                      hint:'Mit Händen einpatchen',                         key:'gg-toner' },
-      { id:'a5', step:'Feuchtigkeit', name:'TO Hyaluronic Acid 2% + B5',                      hint:'Auf leicht feuchte Haut',                       key:'to-ha' },
-      { id:'a6', step:'Abschluss',    name:'G&G Happier Barrier Creme',                       hint:'Besonders wichtig nach Säuren/Retinal',         key:'gg-happier' },
-    ],
-  };
+  return [
+    { id:'a1', step:'Öl-Reinigung',     name:'Mixsoon Bean Cleansing Oil',      hint:'Entfernt SPF, Make-up, Schmutz gründlich', key:'mixsoon-oil', must:true },
+    { id:'a2', step:'Wasser-Reinigung', name:"Paula's Choice Oil-Reducing Cleanser", hint:'Kurz aber wichtig',                  key:'pc-cleanser', must:true },
+    { id:'a3', step:'Toner',            name:'G&G Liquid Hydration Toner',      hint:'Mit Händen einpatchen',                   key:'gg-toner',    must:false },
+    { id:'a4', step:`Aktiv-Schritt · ${a.label}`, name: a.prod,
+      hint: a.tag==='pause' ? 'Heute Pause – Haut erholen lassen' : 'Kern der Hautverbesserung – nie weglassen!',
+      key: a.key, isPause: a.tag==='pause', must:true },
+    { id:'a5', step:'Feuchtigkeit',     name:'TO Hyaluronic Acid 2% + B5',      hint:'Auf leicht feuchte Haut',                 key:'to-ha',       must:false },
+    { id:'a6', step:'Abschluss',        name:'G&G Happier Barrier Creme',        hint:'Besonders wichtig nach Säuren/Retinal',  key:'gg-happier',  must:false },
+  ];
 }
 
-// ─── STATE ──────────────────────────────────────────────────────────────────
+// ─── STATE ───────────────────────────────────────────────────────────────────
 
 const TODAY = new Date();
-let dayOffset = 0;
-let activeTab = null;
-let manualTab = false;
+let dayOffset  = 0;
+let activeTab  = null;
+let manualTab  = false;
+let pickerOpen = false;
 
 function dateForOffset(off) {
-  const d = new Date(TODAY);
-  d.setDate(d.getDate() + off);
-  return d;
+  const d = new Date(TODAY); d.setDate(d.getDate() + off); return d;
 }
-
 function dateKey(d) { return d.toISOString().slice(0,10); }
 
 function readChecked(date) {
   try { return JSON.parse(localStorage.getItem('sk_' + dateKey(date)) || '{}'); }
   catch { return {}; }
 }
-
 function writeChecked(date, data) {
   localStorage.setItem('sk_' + dateKey(date), JSON.stringify(data));
-  // prune old entries
+  // prune old data
   const cutoff = new Date(TODAY);
-  cutoff.setDate(cutoff.getDate() - MAX_HIST - 1);
+  cutoff.setDate(cutoff.getDate() - MAX_BACK - 2);
   const cutStr = dateKey(cutoff);
-  for (const k of Object.keys(localStorage)) {
+  for (const k of Object.keys(localStorage))
     if (k.startsWith('sk_') && k.slice(3) < cutStr) localStorage.removeItem(k);
-  }
 }
-
 function toggle(id) {
   const d = dateForOffset(dayOffset);
   const data = readChecked(d);
@@ -496,103 +481,137 @@ function toggle(id) {
   return !!data[id];
 }
 
-// ─── RENDER ─────────────────────────────────────────────────────────────────
+function isReadonly() { return dayOffset !== 0; }
+
+// ─── RENDER ──────────────────────────────────────────────────────────────────
 
 const CHECKMARK = `<svg width="10" height="8" viewBox="0 0 10 8" fill="none">
   <path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`;
 
-const INFO_ICON = `<svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+const INFO_ICO = `<svg width="11" height="11" viewBox="0 0 11 11" fill="none">
   <circle cx="5.5" cy="5.5" r="4.75" stroke="currentColor" stroke-width="1.1"/>
   <path d="M5.5 5V7.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
   <circle cx="5.5" cy="3.5" r=".6" fill="currentColor"/>
 </svg>`;
 
-function itemHTML(item, isMust) {
+function itemHTML(item) {
   const date = dateForOffset(dayOffset);
-  const checked = readChecked(date);
-  const done = !!checked[item.id];
-  const ro = dayOffset < 0;
+  const chk  = readChecked(date);
+  const done = !!chk[item.id];
+  const ro   = isReadonly();
+  const cls  = `item ${item.must ? 'must' : 'opt'} ${done ? 'done' : ''} ${ro ? 'ro' : ''}`;
   const hasInfo = item.key && !item.isPause;
 
-  return `<div class="item${isMust?' must':''}${done?' done':''}${ro?' ro':''}"
-      id="item-${item.id}" onclick="handleClick('${item.id}',event)">
+  return `<div class="${cls}" id="item-${item.id}" onclick="handleClick('${item.id}',event)">
     <div class="chk">${CHECKMARK}</div>
     <div class="item-body">
       <div class="item-meta">
         <span class="item-step">${item.step}</span>
-        ${isMust && !item.isPause ? '<span class="ptag m">Muss</span>' : ''}
-        ${!isMust ? '<span class="ptag o">optional</span>' : ''}
+        ${item.must && !item.isPause ? '<span class="ptag m">Muss</span>' : ''}
+        ${!item.must ? '<span class="ptag o">optional</span>' : ''}
       </div>
       <div class="item-name">${item.name}</div>
       <div class="item-hint">${item.hint}</div>
     </div>
-    ${hasInfo ? `<button class="ibtn" onclick="showInfo('${item.key}',event)" aria-label="Produktinfo">${INFO_ICON}</button>` : ''}
+    ${hasInfo ? `<button class="ibtn" onclick="showInfo('${item.key}',event)">${INFO_ICO}</button>` : ''}
   </div>`;
 }
 
 function renderDay() {
-  const date = dateForOffset(dayOffset);
+  const date   = dateForOffset(dayOffset);
   const dayIdx = date.getDay();
-  const ab = buildAbendsItems(dayIdx);
+  const ab     = buildAbends(dayIdx);
 
-  document.getElementById('m-must').innerHTML = M_MUST.map(i => itemHTML(i, true)).join('');
-  document.getElementById('m-opt').innerHTML  = M_OPT.map(i  => itemHTML(i, false)).join('');
-  document.getElementById('a-must').innerHTML = ab.must.map(i => itemHTML(i, true)).join('');
-  document.getElementById('a-opt').innerHTML  = ab.opt.map(i  => itemHTML(i, false)).join('');
+  document.getElementById('m-list').innerHTML = MORGENS.map(itemHTML).join('');
+  document.getElementById('a-list').innerHTML = ab.map(itemHTML).join('');
 
-  const aktiv = ab.aktiv;
+  // Aktiv banner (abends only, above list)
+  const aktiv = WPLAN[dayIdx];
   document.getElementById('a-aktiv').innerHTML = `
     <div class="aktiv-card">
       <div class="aktiv-pill ${aktiv.tag}">${aktiv.label}</div>
       <div class="aktiv-meta">
-        <div class="aktiv-day">${DAYS[dayIdx]}</div>
+        <div class="aktiv-day">${DAYS_DE[dayIdx]}</div>
         <div class="aktiv-prod">${aktiv.prod}</div>
       </div>
     </div>`;
 
-  // date label
-  const isToday = dayOffset === 0;
+  // Date button label
   const dd = String(date.getDate()).padStart(2,'0');
   const mo = String(date.getMonth()+1).padStart(2,'0');
-  const dn = DAYS[dayIdx];
-  document.getElementById('dateLbl').innerHTML = isToday
-    ? `<span class="dn">${dn}</span>, ${dd}.${mo}.`
-    : `<span class="past-tag">vor ${Math.abs(dayOffset)}d</span><span class="dn">${dn}</span>, ${dd}.${mo}.`;
+  const isToday  = dayOffset === 0;
+  const isFuture = dayOffset > 0;
+  document.getElementById('dateLbl').textContent = isToday
+    ? `${DAYS_DE[dayIdx]}, ${dd}.${mo}.`
+    : `${DAYS_SH[dayIdx]} ${dd}.${mo}.`;
+  const btn = document.getElementById('datebtn');
+  btn.classList.toggle('is-past',   !isToday && !isFuture);
+  btn.classList.toggle('is-future', isFuture);
 
-  document.getElementById('prevBtn').disabled = dayOffset <= -(MAX_HIST-1);
-  document.getElementById('nextBtn').disabled = dayOffset >= 0;
-  document.getElementById('pastNotice').classList.toggle('show', !isToday);
+  // Notice bar
+  const noticeEl = document.getElementById('notice');
+  noticeEl.className = 'notice';
+  if (!isToday) {
+    noticeEl.classList.add(isFuture ? 'future' : 'past');
+    noticeEl.textContent = isFuture ? 'Vorschau · nur lesend' : 'Vergangener Tag · nur lesend';
+  }
 
+  renderChips();
   updateProgress();
 }
 
-function updateProgress() {
-  const date = dateForOffset(dayOffset);
-  const dayIdx = date.getDay();
-  const ab = buildAbendsItems(dayIdx);
-  const items = activeTab === 'morgens'
-    ? [...M_MUST, ...M_OPT]
-    : [...ab.must, ...ab.opt];
+function renderChips() {
+  const chips = document.getElementById('dayChips');
+  chips.innerHTML = '';
+  for (let off = -MAX_BACK; off <= MAX_FWD; off++) {
+    const d    = dateForOffset(off);
+    const di   = d.getDay();
+    const dd   = String(d.getDate()).padStart(2,'0');
+    const mo   = String(d.getMonth()+1).padStart(2,'0');
+    const data = readChecked(d);
+    const hasD = Object.keys(data).length > 0;
+    const isFuture = off > 0;
 
-  const checked = readChecked(date);
-  const done  = items.filter(i => checked[i.id]).length;
-  const total = items.length;
-  const pct   = total ? (done / total) * 100 : 0;
+    const cls = ['chip',
+      off === 0 ? 'today' : '',
+      off === dayOffset ? 'selected' : '',
+      isFuture ? 'future' : '',
+      hasD && off !== 0 ? 'has-data' : '',
+    ].filter(Boolean).join(' ');
+
+    const btn = document.createElement('button');
+    btn.className = cls;
+    btn.innerHTML = `<div class="chip-day">${DAYS_SH[di]}</div><div class="chip-date">${dd}.${mo}</div><div class="chip-dot"></div>`;
+    btn.onclick = () => { dayOffset = off; renderDay(); closePicker(); };
+    chips.appendChild(btn);
+  }
+  // scroll selected chip into view
+  const selected = chips.querySelector('.selected');
+  if (selected) selected.scrollIntoView({ inline: 'center', behavior: 'smooth' });
+}
+
+function updateProgress() {
+  const date   = dateForOffset(dayOffset);
+  const dayIdx = date.getDay();
+  const items  = activeTab === 'morgens' ? MORGENS : buildAbends(dayIdx);
+  const chk    = readChecked(date);
+  const done   = items.filter(i => chk[i.id]).length;
+  const total  = items.length;
+  const pct    = total ? (done / total) * 100 : 0;
 
   document.getElementById('progCount').textContent = `${done}/${total}`;
   const fill = document.getElementById('progFill');
   fill.style.width = pct + '%';
   fill.classList.toggle('dot', done > 0 && done < total);
-  fill.style.boxShadow = done === total && total > 0
-    ? '0 0 10px rgba(122,89,184,.45)' : '';
+  fill.style.boxShadow = done === total && total > 0 ? '0 0 10px rgba(122,89,184,.5)' : '';
 }
 
-// ─── INTERACTIONS ────────────────────────────────────────────────────────────
+// ─── INTERACTIONS ─────────────────────────────────────────────────────────────
 
 function handleClick(id, e) {
   if (e.target.closest('.ibtn')) return;
-  if (dayOffset < 0) return; // readonly
+  if (isReadonly()) return;
   const nowDone = toggle(id);
   const el = document.getElementById('item-' + id);
   el.classList.toggle('done', nowDone);
@@ -601,8 +620,7 @@ function handleClick(id, e) {
 
 function showInfo(key, e) {
   e.stopPropagation();
-  const p = PINFO[key];
-  if (!p) return;
+  const p = PINFO[key]; if (!p) return;
   document.getElementById('sheetBody').innerHTML = `
     <div class="s-cat">${p.cat}</div>
     <div class="s-name">${p.name}</div>
@@ -620,20 +638,38 @@ function closeSheet() {
   document.body.style.overflow = '';
 }
 
-// swipe down to close sheet
 let _ty = 0;
 document.getElementById('sheet').addEventListener('touchstart', e => { _ty = e.touches[0].clientY; }, {passive:true});
 document.getElementById('sheet').addEventListener('touchend',   e => { if (e.changedTouches[0].clientY - _ty > 50) closeSheet(); }, {passive:true});
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSheet(); closePicker(); } });
 
-// ─── DAY NAV ────────────────────────────────────────────────────────────────
+// ─── DAY PICKER ──────────────────────────────────────────────────────────────
 
-function shiftDay(delta) {
-  const next = dayOffset + delta;
-  if (next > 0 || next < -(MAX_HIST-1)) return;
-  dayOffset = next;
-  renderDay();
+function togglePicker() {
+  pickerOpen ? closePicker() : openPicker();
 }
+function openPicker() {
+  pickerOpen = true;
+  document.getElementById('dayPicker').classList.add('open');
+  document.getElementById('datebtn').classList.add('open');
+  syncSpacer();
+  // auto-scroll to selected chip
+  setTimeout(() => {
+    const sel = document.getElementById('dayChips').querySelector('.selected');
+    if (sel) sel.scrollIntoView({ inline:'center', behavior:'smooth' });
+  }, 50);
+}
+function closePicker() {
+  pickerOpen = false;
+  document.getElementById('dayPicker').classList.remove('open');
+  document.getElementById('datebtn').classList.remove('open');
+  syncSpacer();
+}
+
+// close picker when tapping outside header
+document.addEventListener('click', e => {
+  if (pickerOpen && !document.getElementById('hdr').contains(e.target)) closePicker();
+});
 
 // ─── TABS ────────────────────────────────────────────────────────────────────
 
@@ -653,27 +689,19 @@ function autoTab() {
   selTab(h >= 6 && h < 18 ? 'morgens' : 'abends');
 }
 
-// ─── CLOCK ───────────────────────────────────────────────────────────────────
-
-function tick() {
-  const now = new Date();
-  document.getElementById('clockEl').textContent =
-    String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
-}
-
-// ─── INIT ────────────────────────────────────────────────────────────────────
+// ─── SPACER ──────────────────────────────────────────────────────────────────
 
 function syncSpacer() {
   document.getElementById('spacer').style.height = document.getElementById('hdr').offsetHeight + 'px';
 }
 
+// ─── INIT ────────────────────────────────────────────────────────────────────
+
 renderDay();
 autoTab();
-tick();
 syncSpacer();
 
 new ResizeObserver(syncSpacer).observe(document.getElementById('hdr'));
-setInterval(tick,    30_000);
 setInterval(autoTab, 60_000);
 </script>
 </body>
