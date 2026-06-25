@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0d0d10">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
-  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="apple-touch-icon" sizes="512x512" href="icon.png">
   <title>Skincare</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -678,105 +678,7 @@ syncSpacer();
 new ResizeObserver(syncSpacer).observe(document.getElementById('hdr'));
 setInterval(autoTab, 60_000);
 
-// ─── ICON GENERATION ─────────────────────────────────────────────────────────
-// Draws a face illustration to canvas and injects it as apple-touch-icon
-
-function generateIcon() {
-  const cv = document.createElement('canvas');
-  cv.width = 180; cv.height = 180;
-  const g = cv.getContext('2d');
-  g.lineCap = 'round'; g.lineJoin = 'round';
-
-  // Rounded clip
-  g.beginPath();
-  const r = 38;
-  g.moveTo(r, 0); g.lineTo(180 - r, 0); g.quadraticCurveTo(180, 0, 180, r);
-  g.lineTo(180, 180 - r); g.quadraticCurveTo(180, 180, 180 - r, 180);
-  g.lineTo(r, 180); g.quadraticCurveTo(0, 180, 0, 180 - r);
-  g.lineTo(0, r); g.quadraticCurveTo(0, 0, r, 0); g.closePath();
-  g.clip();
-
-  // Background
-  const bg = g.createRadialGradient(90, 68, 0, 90, 90, 118);
-  bg.addColorStop(0, '#1c0e36'); bg.addColorStop(1, '#09090d');
-  g.fillStyle = bg; g.fillRect(0, 0, 180, 180);
-
-  // Glow
-  const glow = g.createRadialGradient(90, 88, 0, 90, 88, 82);
-  glow.addColorStop(0, 'rgba(122,89,184,.2)'); glow.addColorStop(1, 'rgba(122,89,184,0)');
-  g.fillStyle = glow; g.fillRect(0, 0, 180, 180);
-
-  // Hair top mass
-  g.fillStyle = '#4a2e88';
-  g.beginPath(); g.ellipse(90, 70, 57, 50, 0, 0, Math.PI * 2); g.fill();
-
-  // Side flowing hair
-  g.strokeStyle = '#4a2e88'; g.lineWidth = 16;
-  g.beginPath(); g.moveTo(37, 100); g.quadraticCurveTo(27, 133, 33, 168); g.stroke();
-  g.beginPath(); g.moveTo(143, 100); g.quadraticCurveTo(153, 133, 147, 168); g.stroke();
-
-  // Hair highlight
-  g.strokeStyle = '#7050b8'; g.lineWidth = 2.5;
-  g.beginPath(); g.moveTo(70, 28); g.quadraticCurveTo(90, 21, 110, 28); g.stroke();
-  g.globalAlpha = .5; g.stroke(); g.globalAlpha = 1;
-
-  // Face
-  g.fillStyle = '#0d0d14'; g.strokeStyle = '#c0a8e8'; g.lineWidth = 1.8;
-  g.beginPath(); g.ellipse(90, 103, 47, 57, 0, 0, Math.PI * 2); g.fill(); g.stroke();
-
-  // Eyebrows
-  g.strokeStyle = '#c8b0ec'; g.lineWidth = 2.5;
-  g.beginPath(); g.moveTo(66, 82); g.quadraticCurveTo(74, 77, 82, 79); g.stroke();
-  g.beginPath(); g.moveTo(98, 79); g.quadraticCurveTo(106, 77, 114, 82); g.stroke();
-
-  // Left eye
-  g.strokeStyle = '#c0a8e8'; g.lineWidth = 1.8;
-  g.beginPath(); g.moveTo(64, 95); g.quadraticCurveTo(74, 88, 84, 95); g.quadraticCurveTo(74, 102, 64, 95); g.closePath(); g.stroke();
-  g.fillStyle = '#c0a8e8'; g.beginPath(); g.arc(74, 95, 4, 0, Math.PI * 2); g.fill();
-  g.fillStyle = '#0d0d14'; g.beginPath(); g.arc(75.5, 93.5, 1.5, 0, Math.PI * 2); g.fill();
-
-  // Right eye
-  g.strokeStyle = '#c0a8e8'; g.lineWidth = 1.8;
-  g.beginPath(); g.moveTo(96, 95); g.quadraticCurveTo(106, 88, 116, 95); g.quadraticCurveTo(106, 102, 96, 95); g.closePath(); g.stroke();
-  g.fillStyle = '#c0a8e8'; g.beginPath(); g.arc(106, 95, 4, 0, Math.PI * 2); g.fill();
-  g.fillStyle = '#0d0d14'; g.beginPath(); g.arc(107.5, 93.5, 1.5, 0, Math.PI * 2); g.fill();
-
-  // Nose (two subtle dots)
-  g.fillStyle = 'rgba(184,160,216,.45)';
-  g.beginPath(); g.arc(87, 117, 2, 0, Math.PI * 2); g.fill();
-  g.beginPath(); g.arc(93, 117, 2, 0, Math.PI * 2); g.fill();
-
-  // Lips
-  g.strokeStyle = '#c0a8e8'; g.lineWidth = 2;
-  // Upper (cupid's bow)
-  g.beginPath(); g.moveTo(76, 132);
-  g.bezierCurveTo(82, 127, 87, 126, 90, 128);
-  g.bezierCurveTo(93, 126, 98, 127, 104, 132); g.stroke();
-  // Lower
-  g.beginPath(); g.moveTo(76, 132); g.bezierCurveTo(83, 140, 97, 140, 104, 132); g.stroke();
-
-  // Cheek dots
-  g.fillStyle = 'rgba(122,89,184,.42)';
-  g.beginPath(); g.arc(57, 110, 2.5, 0, Math.PI * 2); g.fill();
-  g.fillStyle = 'rgba(122,89,184,.28)';
-  g.beginPath(); g.arc(52, 118, 1.7, 0, Math.PI * 2); g.fill();
-  g.fillStyle = 'rgba(122,89,184,.42)';
-  g.beginPath(); g.arc(123, 110, 2.5, 0, Math.PI * 2); g.fill();
-  g.fillStyle = 'rgba(122,89,184,.28)';
-  g.beginPath(); g.arc(128, 118, 1.7, 0, Math.PI * 2); g.fill();
-
-  return cv.toDataURL('image/png');
-}
-
-try {
-  const iconUrl = generateIcon();
-  ['apple-touch-icon', 'shortcut icon'].forEach((rel, i) => {
-    const l = document.createElement('link');
-    l.rel = rel; l.href = iconUrl;
-    if (i === 1) l.type = 'image/png';
-    document.head.appendChild(l);
-  });
-} catch(e) { /* silently ignore if canvas blocked */ }
+// Icon is served as static icon.png referenced in <head>.
 </script>
 </body>
 </html>
